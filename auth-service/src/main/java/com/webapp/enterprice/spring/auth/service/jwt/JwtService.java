@@ -19,7 +19,7 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    public static String SECRET;
+    public String SECRET;
 
     // Generate token with given user name
     public String generateToken(String email) {
