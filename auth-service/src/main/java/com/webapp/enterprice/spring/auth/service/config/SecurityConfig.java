@@ -1,8 +1,6 @@
 package com.webapp.enterprice.spring.auth.service.config;
 
 import com.webapp.enterprice.spring.auth.service.jwt.JwtFilter;
-import com.webapp.enterprice.spring.auth.service.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
