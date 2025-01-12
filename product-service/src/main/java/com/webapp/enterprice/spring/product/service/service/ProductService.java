@@ -15,6 +15,7 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+
     public List<Product> findAll() {
         return productRepository.findAllByOrderByIdAsc();
     }
@@ -23,6 +24,15 @@ public class ProductService {
         return productRepository.getProductById(id);
     }
 
+    /**
+     * Saves a new product to the system or updates an existing product if it already exists.
+     *
+     * @param productRequest The request object containing product details.
+     *
+     * This method creates a new Product object based on the provided ProductRequest.
+     * If a product with the same name already exists, it updates the quantity and price of the existing product.
+     * Otherwise, it saves the new product to the repository.
+     */
     public void save(ProductRequest productRequest) {
         Product newProduct = new Product();
         newProduct.setName(productRequest.getName());
@@ -42,6 +52,14 @@ public class ProductService {
         }
     }
 
+    /**
+     * Updates an existing product in the system.
+     *
+     * @param product The product details to update.
+     *
+     * This method updates the details of an existing product in the system.
+     * The updated product is saved to the repository.
+     */
     public void update(Product product) {
         System.out.println("Product Service:: "+product.getQuantity());
         productRepository.save(product);
