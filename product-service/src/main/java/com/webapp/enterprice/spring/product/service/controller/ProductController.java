@@ -21,6 +21,24 @@ public class ProductController {
         return ResponseEntity.ok(productService.findAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProducts(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.findById(id));
+    }
+
+    public ProductController() {
+        super();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateProduct(@PathVariable Long id , @RequestBody Product product) {
+        System.out.println("Product Controller:: "+product.getQuantity());
+        Product product1 = productService.findById(id);
+        product1.setQuantity(product.getQuantity());
+        productService.update(product1);
+        return ResponseEntity.ok("Product Updated");
+    }
+
     @PostMapping
     public ResponseEntity<String> addProduct(@RequestBody ProductRequest productRequest) {
         productService.save(productRequest);

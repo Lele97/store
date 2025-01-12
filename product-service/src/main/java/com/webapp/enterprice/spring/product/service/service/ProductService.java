@@ -19,6 +19,10 @@ public class ProductService {
         return productRepository.findAllByOrderByIdAsc();
     }
 
+    public Product findById(Long id) {
+        return productRepository.getProductById(id);
+    }
+
     public void save(ProductRequest productRequest) {
         Product newProduct = new Product();
         newProduct.setName(productRequest.getName());
@@ -36,6 +40,11 @@ public class ProductService {
         } else {
             productRepository.save(newProduct);
         }
+    }
+
+    public void update(Product product) {
+        System.out.println("Product Service:: "+product.getQuantity());
+        productRepository.save(product);
     }
 
 }
