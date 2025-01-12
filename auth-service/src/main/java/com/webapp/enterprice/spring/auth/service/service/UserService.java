@@ -19,6 +19,12 @@ public class UserService {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
+    /**
+     * Service for registration new User
+     *
+     * @param userRequest
+     * @throws Exception
+     */
     public void registration(UserRequest userRequest) throws Exception {
         if (repository.findByEmail(userRequest.getEmail()).isPresent()) {
             throw new Exception(userRequest.getUsername() + " already exists");

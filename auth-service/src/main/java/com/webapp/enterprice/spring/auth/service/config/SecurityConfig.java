@@ -24,12 +24,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+
+    /**
+     * List of endpoints that do not require authentication.
+     * These endpoints are publicly accessible without any authorization.
+     */
     private static final String[] AUTH_WHITELIST = {
             "/api/v1/users/login",
             "/api/v1/users/register"
     };
 
-    private static final String ADMIN_PERMISSION = "api/v1/users/products";
+    /**
+     * Endpoint pattern that requires admin permissions.
+     * Only users with the ROLE_ADMIN authority can access these endpoints.
+     */
+    private static final String ADMIN_PERMISSION = "api/v1/products/**";
 
 
     @Bean
@@ -40,6 +49,17 @@ public class SecurityConfig {
     @Autowired
     private  JwtFilter jwtFilter;
 
+    /**
+     * Configures the security filter chain for HTTP requests.
+     *
+     * @param http The HttpSecurity object to configure.
+     * @return SecurityFilterChain The configured security filter chain.
+     * @throws Exception If an error occurs during configuration.
+     *
+     * This method disables CSRF protection, configures authorization rules for different endpoints,
+     * sets the session management policy to stateless, and adds the JWT filter before the
+     * UsernamePasswordAuthenticationFilter in the filter chain.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)

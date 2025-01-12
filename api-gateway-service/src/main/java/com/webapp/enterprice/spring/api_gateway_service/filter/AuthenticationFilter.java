@@ -20,6 +20,18 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         super(Config.class);
     }
 
+    /**
+     * Applies the custom GatewayFilter configuration.
+     *
+     * @param config The configuration object for the GatewayFilter.
+     * @return The configured GatewayFilter that processes the request and response.
+     *
+     * This method validates the security of incoming requests. If a request is determined to be secured,
+     * it checks for the presence of the Authorization header. If the Authorization header is missing,
+     * an exception is thrown. If the Authorization header is present and starts with "Bearer ", the token
+     * is extracted and validated. If the token is invalid, an exception is thrown.
+     *
+     */
     @Override
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
@@ -43,7 +55,5 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         });
     }
 
-    public static class Config {
-
-    }
+    public static class Config { }
 }
