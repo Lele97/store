@@ -27,12 +27,12 @@ The Store Management System is a robust application that helps manage the invent
 - Maven: Build and dependency management tool.
 - JUnit: Testing framework.
 
-## Application endpoint
+### Application endpoint
 
-## Api Gateway Endpoint
+##Api Gateway Endpoint
 
  - POST  /api/v1/users/register
-     - rrrr
+  - 
 
 
 GET /api/v1/products: Retrieve all products
