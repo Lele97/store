@@ -27,26 +27,27 @@ The Store Management System is a robust application that helps manage the invent
 - Maven: Build and dependency management tool.
 - JUnit: Testing framework.
 
-### Application endpoint
+## Application endpoint
 
-##Api Gateway Endpoint
+### Api Gateway Endpoint
 
  - POST  /api/v1/users/register
-  - 
+  - Register new user
 
+ - POST /api/v1/users/login
+  - Get token
+ 
+ - POST /api/v1/products
+  - Add product {required token}
 
-GET /api/v1/products: Retrieve all products
-GET /api/v1/products/{id}: Retrieve a product by ID
-POST /api/v1/products: Add a new product
-PUT /api/v1/products/{id}: Update an existing product
-DELETE /api/v1/products/{id}: Delete a product
+ - GET /api/v1/products
+  - Get Products {required token}
 
-Order Endpoints
-GET /api/v1/orders: Retrieve all orders
-GET /api/v1/orders/{id}: Retrieve an order by ID
-POST /api/v1/orders: Add a new order
-PUT /api/v1/orders/{id}: Update an existing order
-DELETE /api/v1/orders/{id}: Delete an order
-
+ - GET /api/v1/orders/{id}
+  - Get order by id {required token}
+   
+ - POST /api/v1/orders
+  - Add a new order {required token}
+ 
 ## License
 This project is licensed under the MIT License.
