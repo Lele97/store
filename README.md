@@ -6,12 +6,7 @@ Welcome to the Store Management System project! This repository contains the cod
 - Introduction
 - Features
 - Technologies Used
-- Getting Started
-- Installation
-- Configuration
-- Usage
-- Running Tests
-- Contributing
+- Application endpoint
 - License
 
 ## Introduction
@@ -32,6 +27,7 @@ The Store Management System is a robust application that helps manage the invent
 - Maven: Build and dependency management tool.
 - JUnit: Testing framework.
 
+## Application endpoint
 
 Product Endpoints
 GET /api/v1/products: Retrieve all products
