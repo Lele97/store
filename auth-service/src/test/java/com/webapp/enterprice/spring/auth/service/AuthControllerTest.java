@@ -5,142 +5,122 @@ import com.webapp.enterprice.spring.auth.service.entity.AuthRequest;
 import com.webapp.enterprice.spring.auth.service.entity.UserRequest;
 import com.webapp.enterprice.spring.auth.service.jwt.JwtService;
 import com.webapp.enterprice.spring.auth.service.service.UserService;
+import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-@WebMvcTest(AuthController.class)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Log4j
 public class AuthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc; // Used to perform HTTP requests in tests
+    @Mock
+    private UserService userService;
 
     @Mock
-    private UserService userService; // Mocked UserService for dependency injection
+    private JwtService jwtService;
 
     @Mock
-    private JwtService jwtService; // Mocked JwtService for dependency injection
+    private AuthenticationManager authenticationManager;
 
-    @Mock
-    private AuthenticationManager authenticationManager; // Mocked AuthenticationManager for dependency injection
+    @InjectMocks
+    private AuthController authController;
 
-    @Mock
-    private Authentication authentication; // Mocked Authentication object for testing
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this); // Initializes mocks before each test
+        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
     }
 
-    /**
-     * Test for the /register endpoint.
-     * This test verifies that a new user can be registered successfully.
-     *
-     * @throws Exception
-     */
     @Test
-    @Order(1)
-    void testRegister() throws Exception {
-        // Create a mock UserRequest object
+    void shouldRegisterUserSuccessfully() throws Exception {
         UserRequest userRequest = new UserRequest();
         userRequest.setUsername("testuser");
         userRequest.setPassword("password");
-        userRequest.setEmail("test@example.com");
+        userRequest.setEmail("testuser@example.com");
+        userRequest.setRoles("ROLE_USER");
 
-        // Mock the registration method to do nothing
-        doNothing().when(userService).registration(any(UserRequest.class));
-
-        // Perform a POST request to /api/v1/users/register with the user data
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/users/register")
+        mockMvc.perform(post("/api/v1/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\",\"password\":\"password\",\"email\":\"test@example.com\"}"))
-                .andExpect(status().isCreated()) // Expect HTTP 201 Created status
-                .andExpect(content().string("Registration successful")); // Expect the success message
+                        .content("{\"username\":\"testuser\",\"password\":\"password\",\"email\":\"testuser@example.com\",\"roles\":\"ROLE_USER\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("Registration successful"));
 
-        // Verify that the registration method was called once with the provided UserRequest
         verify(userService, times(1)).registration(any(UserRequest.class));
     }
 
-    /**
-     * Test for the /login endpoint.
-     * This test verifies that a user can log in and receive a JWT token.
-     *
-     * @throws Exception
-     */
     @Test
-    @Order(2)
-    void testAuthenticateAndGetToken() throws Exception {
-        // Create a mock AuthRequest object
-        AuthRequest authRequest = new AuthRequest();
-        authRequest.setEmail("test@example.com");
-        authRequest.setPassword("password");
+    void shouldReturnInternalServerErrorOnRegistrationFailure() throws Exception {
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUsername("testuser");
+        userRequest.setPassword("password");
+        userRequest.setEmail("testuser@example.com");
+        userRequest.setRoles("ROLE_USER");
 
-        // Mock the authentication process and token generation
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(authentication);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        when(jwtService.generateToken(anyString())).thenReturn("jwt-token");
+        doThrow(new Exception("Registration failed")).when(userService).registration(any(UserRequest.class));
 
-        // Perform a POST request to /api/v1/users/login with the auth data
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/users/login")
+        mockMvc.perform(post("/api/v1/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"test@example.com\",\"password\":\"password\"}"))
-                .andExpect(status().isOk()) // Expect HTTP 200 OK status
-                .andExpect(content().string("jwt-token")); // Expect the JWT token
+                        .content("{\"username\":\"testuser\",\"password\":\"password\",\"email\":\"testuser@example.com\",\"roles\":\"ROLE_USER\"}"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string("Registration failed"));
 
-        // Verify that the authentication and token generation methods were called once
-        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtService, times(1)).generateToken("test@example.com");
+        verify(userService, times(1)).registration(any(UserRequest.class));
     }
 
-    /**
-     * Test for the /login endpoint with invalid credentials.
-     * This test verifies that an invalid login attempt returns an appropriate error message.
-     *
-     * @throws Exception
-     */
     @Test
-    @Order(3)
-    void testAuthenticateAndGetToken_Failure() throws Exception {
-        // Create a mock AuthRequest object with invalid credentials
+    void shouldAuthenticateAndGenerateTokenSuccessfully() throws Exception {
         AuthRequest authRequest = new AuthRequest();
-        authRequest.setEmail("invalid@example.com");
-        authRequest.setPassword("wrongpassword");
+        authRequest.setEmail("testuser@example.com");
+        authRequest.setPassword("password");
 
-        // Mock the authentication process to throw an exception
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new AuthenticationException("Invalid credentials") {});
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+        when(jwtService.generateToken(authRequest.getEmail())).thenReturn("jwt-token");
 
-        // Perform a POST request to /api/v1/users/login with the invalid auth data
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/users/login")
+        mockMvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"invalid@example.com\",\"password\":\"wrongpassword\"}"))
-                .andExpect(status().isUnauthorized()) // Expect HTTP 401 Unauthorized status
-                .andExpect(content().string("Authentication failed: Invalid credentials")); // Expect the failure message
+                        .content("{\"email\":\"testuser@example.com\",\"password\":\"password\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("jwt-token"));
 
-        // Verify that the authentication method was called once
+        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(jwtService, times(1)).generateToken(authRequest.getEmail());
+    }
+
+    @Test
+    void shouldReturnUnauthorizedOnAuthenticationFailure() throws Exception {
+        AuthRequest authRequest = new AuthRequest();
+        authRequest.setEmail("testuser@example.com");
+        authRequest.setPassword("password");
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenThrow(new AuthenticationException("Authentication failed") {});
+
+        mockMvc.perform(post("/api/v1/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"testuser@example.com\",\"password\":\"password\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Authentication failed: Authentication failed"));
+
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 }
