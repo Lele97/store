@@ -32,22 +32,22 @@ The Store Management System is a robust application that helps manage the invent
 ### Api Gateway Endpoint
 
  - POST  /api/v1/users/register
-  - Register new user
+   - Register new user
 
  - POST /api/v1/users/login
-  - Get token
+   - Get token
  
  - POST /api/v1/products
-  - Add product {required token}
+   - Add product {required token}
 
  - GET /api/v1/products
-  - Get Products {required token}
+   - Get Products {required token}
 
  - GET /api/v1/orders/{id}
-  - Get order by id {required token}
+   - Get order by id {required token}
    
  - POST /api/v1/orders
-  - Add a new order {required token}
+   - Add a new order {required token}
  
 ## License
 This project is licensed under the MIT License.
