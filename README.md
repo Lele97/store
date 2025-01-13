@@ -1,26 +1,18 @@
-Store Management System
+# Store Management System
 Welcome to the Store Management System project! This repository contains the code for a comprehensive application designed to manage store inventories, orders, and products efficiently.
 
-Table of Contents
-Introduction
+## Table of Contents
 
-Features
-
-Technologies Used
-
-Getting Started
-
-Installation
-
-Configuration
-
-Usage
-
-Running Tests
-
-Contributing
-
-License
+-Introduction
+-Features
+-Technologies Used
+-Getting Started
+-Installation
+-Configuration
+-Usage
+-Running Tests
+-Contributing
+-License
 
 Introduction
 The Store Management System is a robust application that helps manage the inventory, orders, and products of a store. It is built using modern technologies to ensure efficiency, scalability, and ease of use.
