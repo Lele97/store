@@ -29,7 +29,12 @@ The Store Management System is a robust application that helps manage the invent
 
 ## Application endpoint
 
-Product Endpoints
+## Api Gateway Endpoint
+
+ - POST  /api/v1/users/register
+     - rrrr
+
+
 GET /api/v1/products: Retrieve all products
 GET /api/v1/products/{id}: Retrieve a product by ID
 POST /api/v1/products: Add a new product
