@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtService {
@@ -27,11 +29,15 @@ public class JwtService {
      * @param email
      * @return
      */
-    public String generateToken(String email) {
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, email);
-    }
+        claims.put("sub", userDetails.getUsername()); // Subject (email)
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority) // Extract role names
+                .collect(Collectors.toList())); // Add roles to claims
 
+        return createToken(claims, userDetails.getUsername());
+    }
 
     /**
      * Create a JWT token with specified claims and subject (email)
@@ -41,7 +47,12 @@ public class JwtService {
      * @return
      */
     private String createToken(Map<String, Object> claims, String email) {
-        return Jwts.builder().setClaims(claims).setSubject(email).setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // Token valid for 30 minutes
+        return Jwts
+                .builder()
+                .setClaims(claims)
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // Token valid for 30 minutes
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
 

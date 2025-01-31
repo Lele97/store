@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,14 +32,14 @@ public class AuthServiceTest {
 
     private UserRequest userRequest;
 
-    @BeforeEach
-    void setUp() {
-        userRequest = new UserRequest();
-        userRequest.setUsername("testuser");
-        userRequest.setPassword("password");
-        userRequest.setEmail("testuser@example.com");
-        userRequest.setRoles("ROLE_USER");
-    }
+//    @BeforeEach
+//    void setUp() {
+//        userRequest = new UserRequest();
+//        userRequest.setUsername("testuser");
+//        userRequest.setPassword("password");
+//        userRequest.setEmail("testuser@example.com");
+//        userRequest.setRoles(Collections.singleton("ROLE_USER"));
+//    }
 
     @Test
     void shouldThrowExceptionWhenUserAlreadyExists() {

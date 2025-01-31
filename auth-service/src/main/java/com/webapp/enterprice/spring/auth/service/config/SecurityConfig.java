@@ -31,14 +31,15 @@ public class SecurityConfig {
      */
     private static final String[] AUTH_WHITELIST = {
             "/api/v1/users/login",
-            "/api/v1/users/register"
+            "/api/v1/users/register",
+           "/api/v1/users/test"
     };
 
     /**
      * Endpoint pattern that requires admin permissions.
      * Only users with the ROLE_ADMIN authority can access these endpoints.
      */
-    private static final String ADMIN_PERMISSION = "api/v1/products/**";
+    private static final String[] ADMIN_PERMISSION = {"api/v1/products", "/api/v1/products/**"};
 
 
     @Bean
@@ -65,8 +66,8 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(AUTH_WHITELIST).permitAll()
-                                .requestMatchers(ADMIN_PERMISSION).hasAuthority("ROLE_ADMIN")
-                                .anyRequest().authenticated()).sessionManagement(sessionManagement ->
+                                .requestMatchers(ADMIN_PERMISSION).hasRole("ADMIN").anyRequest().authenticated())
+                .sessionManagement(sessionManagement ->
                         sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
