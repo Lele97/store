@@ -1,9 +1,8 @@
-package com.webapp.enterprice.spring.product.service;
+package com.webapp.enterprice.spring.product.service.service;
 
 import com.webapp.enterprice.spring.product.service.entity.Product;
 import com.webapp.enterprice.spring.product.service.entity.ProductRequest;
 import com.webapp.enterprice.spring.product.service.repository.ProductRepository;
-import com.webapp.enterprice.spring.product.service.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

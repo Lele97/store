@@ -1,6 +1,5 @@
-package com.webapp.enterprice.spring.order.service;
+package com.webapp.enterprice.spring.order.service.controller;
 
-import com.webapp.enterprice.spring.order.service.controller.OrderController;
 import com.webapp.enterprice.spring.order.service.entity.Order;
 import com.webapp.enterprice.spring.order.service.entity.OrderRequest;
 import com.webapp.enterprice.spring.order.service.service.OrderService;
