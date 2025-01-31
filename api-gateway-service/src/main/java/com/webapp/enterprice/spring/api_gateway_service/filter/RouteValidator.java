@@ -22,6 +22,9 @@ public class RouteValidator {
             "/api/v1/users/register"
     );
 
+    /**
+     *  TODO aggiornare javadoc
+     */
     public static final List<String> adminEndpoints = List.of(
             "api/v1/products",
             "/api/v1/products/**");
@@ -40,6 +43,8 @@ public class RouteValidator {
             request -> openApiEndpoints
                     .stream()
                     .noneMatch(uri -> request.getURI().getPath().contains(uri));
-
+    /**
+     * TODO aggiornare javadoc
+     */
     public Predicate<ServerHttpRequest> isAdminEndpoint = request -> adminEndpoints.stream().anyMatch(uri -> request.getURI().getPath().contains(uri));
 }

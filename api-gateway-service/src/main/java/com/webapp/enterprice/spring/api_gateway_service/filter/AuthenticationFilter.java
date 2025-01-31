@@ -35,7 +35,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
      * it checks for the presence of the Authorization header. If the Authorization header is missing,
      * an exception is thrown. If the Authorization header is present and starts with "Bearer ", the token
      * is extracted and validated. If the token is invalid, an exception is thrown.
-     *
+     * TODO aggiornare il javadoc
      */
     @Override
     public GatewayFilter apply(Config config) {
@@ -54,14 +54,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                 String token = authHeader.substring(7);
                 try {
+
                     jwtUtil.validateToken(token);
 
-                    // Extract user details from the token
                     String email = jwtUtil.extractEmail(token);
                     Set<String> roles = jwtUtil.extractRole(token);
-
-                    // Log extracted roles for debugging
-                    System.out.println("Extracted roles: " + roles);
 
                     if(roles.isEmpty()){
                         throw new Exception("No role found");
@@ -80,7 +77,6 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             .build();
 
                 } catch (Exception e) {
-                    System.out.println("Invalid access...!");
                     throw new RuntimeException("Unauthorized access to the application", e);
                 }
             }

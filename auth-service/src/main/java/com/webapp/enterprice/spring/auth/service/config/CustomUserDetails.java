@@ -8,20 +8,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
-    private String username; // This will store the email
+
+    // This will store the email
+    private String username;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    // Constructor for User object
     public CustomUserDetails(User user) {
         this.username = user.getEmail(); // Use getEmail() instead of getUsername()
         this.password = user.getPassword();
-
         // Handle null roles
         this.authorities = user.getRoles() == null ? Collections.emptySet() : user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))

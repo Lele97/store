@@ -90,6 +90,10 @@ public class AuthController {
         }
     }
 
+    /**
+     * TODO aggiornare javadoc
+     * @return
+     */
     @GetMapping("/test")
     public String test() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

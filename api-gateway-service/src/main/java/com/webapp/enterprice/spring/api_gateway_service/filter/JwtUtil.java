@@ -29,6 +29,11 @@ public class JwtUtil {
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
     }
 
+    /**
+     * TODO aggiornare javadoc
+     * @param token
+     * @return
+     */
     public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
@@ -37,57 +42,40 @@ public class JwtUtil {
                 .getBody();
     }
 
-
+    /**
+     * TODO aggiornare javadoc
+     * @param token
+     * @return
+     */
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
     }
 
-
+    /**
+     * TODO aggiornare javadoc
+     * @param token
+     * @return
+     */
     public Set<String> extractRole(String token) {
         try {
+
             Claims claims = extractAllClaims(token);
-          Set<String> role_ = new HashSet<>();
-            // Log the roles claim for debugging
-            System.out.println("Roles claim in token: " + claims.get("roles"));
 
             // Extract the "roles" claim
             List<?> roles = claims.get("roles", List.class);
 
             // Handle null or missing roles
-            if (roles == null) {
-                System.out.println("No roles found in the token");
+            if (roles == null)
                 return Collections.emptySet();
-            }
-
-            // Log the raw roles list for debugging
-            System.out.println("Raw roles list: " + roles);
-
-            long number_of_roles = roles.size();
-
-            number_of_roles = roles.size();
-            System.out.println("Number of roles: " + number_of_roles);
 
             // Extract role names
-           role_ = roles.stream().map(Object::toString).collect(Collectors.toSet());
-//                    .filter(role -> role instanceof Map) // Ensure the role is a Map
-//                    .map(role -> (Map<?, ?>) role) // Cast to Map
-//                    .filter(role -> role.containsKey("name")) // Filter out roles without a "name" field
-//                    .map(role -> {
-//                        Object name = role.get("name");
-//                        return name != null ? name.toString() : null; // Convert to String if not null
-//                    })
-//                    .filter(Objects::nonNull) // Filter out null role names
-//                    .collect(Collectors.toSet());
+            return roles.stream().map(Object::toString).collect(Collectors.toSet());
 
-            System.out.println("Roles list: " + role_);
-
-           return role_;
         } catch (Exception e) {
             System.out.println("Failed to extract roles from token: " + e.getMessage());
             return Collections.emptySet();
         }
     }
-
 
     /**
      * Retrieves the signing key used to validate JWT tokens.
