@@ -1,10 +1,8 @@
-package com.webapp.enterprice.spring.auth.service;
+package com.webapp.enterprice.spring.auth.service.service;
 
 import com.webapp.enterprice.spring.auth.service.entity.User;
 import com.webapp.enterprice.spring.auth.service.entity.UserRequest;
 import com.webapp.enterprice.spring.auth.service.repository.UserRepository;
-import com.webapp.enterprice.spring.auth.service.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,14 +29,14 @@ public class AuthServiceTest {
 
     private UserRequest userRequest;
 
-    @BeforeEach
-    void setUp() {
-        userRequest = new UserRequest();
-        userRequest.setUsername("testuser");
-        userRequest.setPassword("password");
-        userRequest.setEmail("testuser@example.com");
-        userRequest.setRoles("ROLE_USER");
-    }
+//    @BeforeEach
+//    void setUp() {
+//        userRequest = new UserRequest();
+//        userRequest.setUsername("testuser");
+//        userRequest.setPassword("password");
+//        userRequest.setEmail("testuser@example.com");
+//        userRequest.setRoles(Collections.singleton("ROLE_USER"));
+//    }
 
     @Test
     void shouldThrowExceptionWhenUserAlreadyExists() {

@@ -1,13 +1,19 @@
 package com.webapp.enterprice.spring.auth.service.service;
 
+import com.webapp.enterprice.spring.auth.service.entity.Role;
 import com.webapp.enterprice.spring.auth.service.entity.User;
 import com.webapp.enterprice.spring.auth.service.entity.UserRequest;
+import com.webapp.enterprice.spring.auth.service.repository.RoleRepository;
 import com.webapp.enterprice.spring.auth.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +21,9 @@ public class UserService {
 
     @Autowired
     private UserRepository repository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
@@ -34,7 +43,25 @@ public class UserService {
             user.setUsername(userRequest.getUsername());
             user.setPassword(bCryptPasswordEncoder.encode(userRequest.getPassword()));
             user.setEmail(userRequest.getEmail());
-            user.setRoles(userRequest.getRoles());
+
+            Set<Role> roles = new HashSet<>();
+            for (Map<String, Object> roleMap : userRequest.getRoles()) {
+                Long roleId = ((Number) roleMap.get("id")).longValue();
+                String roleName = (String) roleMap.get("name");
+
+                Optional<Role> existingRole = roleRepository.findById(roleId);
+                if (existingRole.isPresent()) {
+                    roles.add(existingRole.get());
+                } else {
+                    Role newRole = new Role();
+                    newRole.setId(roleId);
+                    newRole.setName(roleName);
+                    roleRepository.save(newRole);
+                    roles.add(newRole);
+                }
+            }
+            user.setRoles(roles);
+
             repository.save(user);
         } catch (Exception e) {
             throw new Exception("Registration failed: " + e.getMessage(), e);

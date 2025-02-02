@@ -12,7 +12,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "api/v1/users")
@@ -33,7 +41,7 @@ public class AuthController {
      *
      * @param userRequest The request object containing user registration details.
      * @return A ResponseEntity containing a success message and HTTP status.
-     *
+     * <p>
      * This endpoint registers a new user by calling the registration service.
      * If registration is successful, it returns a HTTP 201 Created status.
      * If registration fails, it returns a HTTP 500 Internal Server Error status with the error message.
@@ -53,7 +61,7 @@ public class AuthController {
      *
      * @param authRequest The request object containing user login details.
      * @return A ResponseEntity containing the JWT token and HTTP status.
-     *
+     * <p>
      * This endpoint authenticates the user by verifying their credentials.
      * If authentication is successful, it generates a JWT token and returns a HTTP 200 OK status.
      * If authentication fails, it returns a HTTP 401 Unauthorized status with an error message.
@@ -62,14 +70,35 @@ public class AuthController {
     public ResponseEntity<String> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
+
             if (authentication.isAuthenticated()) {
-                String token = jwtService.generateToken(authRequest.getEmail());
-                return new ResponseEntity<>(token, HttpStatus.OK);
+
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                String token = jwtService.generateToken(userDetails);
+                Map<String, String> response = new HashMap<>();
+                response.put("token", token);
+                response.put("expiresIn", "1800"); // 30 minutes in seconds
+
+                return new ResponseEntity<>(response.get("token"), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Invalid user request!", HttpStatus.UNAUTHORIZED);
             }
+        } catch (UsernameNotFoundException e) {
+            return new ResponseEntity<>("User not found: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>("Authentication failed: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    /**
+     * TODO aggiornare javadoc
+     * @return
+     */
+    @GetMapping("/test")
+    public String test() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        authorities.forEach(authority -> System.out.println("Role: " + authority.getAuthority()));
+        return "Test endpoint";
     }
 }
