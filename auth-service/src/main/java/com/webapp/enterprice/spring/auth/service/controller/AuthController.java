@@ -15,7 +15,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -67,26 +66,30 @@ public class AuthController {
      * If authentication fails, it returns a HTTP 401 Unauthorized status with an error message.
      */
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<Map<String, String>> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
 
-            if (authentication.isAuthenticated()) {
+           // if (authentication.isAuthenticated()) {
 
                 UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                 String token = jwtService.generateToken(userDetails);
                 Map<String, String> response = new HashMap<>();
+                response.put("code", String.valueOf(HttpStatus.OK));
                 response.put("token", token);
                 response.put("expiresIn", "1800"); // 30 minutes in seconds
 
-                return new ResponseEntity<>(response.get("token"), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Invalid user request!", HttpStatus.UNAUTHORIZED);
-            }
-        } catch (UsernameNotFoundException e) {
-            return new ResponseEntity<>("User not found: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>("Authentication failed: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+//            } else {
+//                return new ResponseEntity<>("Invalid user request!", HttpStatus.UNAUTHORIZED);
+//            }
+//        } catch (UsernameNotFoundException e) {
+//            return new ResponseEntity<>("User not found: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
+       } catch (AuthenticationException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            error.put("code", String.valueOf(HttpStatus.UNAUTHORIZED));
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
     }
 
