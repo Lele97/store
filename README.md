@@ -48,6 +48,9 @@ The Store Management System is a robust application that helps manage the invent
    
  - POST /api/v1/orders
    - Add a new order {required token}
+  
+
+https://chat.deepseek.com/a/chat/s/f3dd47ad-8c21-427c-b80d-6056245e29ec
  
 ## License
 This project is licensed under the MIT License.
