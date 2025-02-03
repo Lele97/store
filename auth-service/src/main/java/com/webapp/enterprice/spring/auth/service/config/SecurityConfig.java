@@ -24,6 +24,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private JwtFilter jwtFilter;
 
     /**
      * List of endpoints that do not require authentication.
@@ -32,7 +34,7 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             "/api/v1/users/login",
             "/api/v1/users/register",
-           "/api/v1/users/test"
+            "/api/v1/users/test"
     };
 
     /**
@@ -47,19 +49,16 @@ public class SecurityConfig {
         return new CustomUserDetailsService(); // Ensure UserInfoService implements UserDetailsService
     }
 
-    @Autowired
-    private  JwtFilter jwtFilter;
-
     /**
      * Configures the security filter chain for HTTP requests.
      *
      * @param http The HttpSecurity object to configure.
      * @return SecurityFilterChain The configured security filter chain.
      * @throws Exception If an error occurs during configuration.
-     *
-     * This method disables CSRF protection, configures authorization rules for different endpoints,
-     * sets the session management policy to stateless, and adds the JWT filter before the
-     * UsernamePasswordAuthenticationFilter in the filter chain.
+     *                   <p>
+     *                   This method disables CSRF protection, configures authorization rules for different endpoints,
+     *                   sets the session management policy to stateless, and adds the JWT filter before the
+     *                   UsernamePasswordAuthenticationFilter in the filter chain.
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -72,7 +71,6 @@ public class SecurityConfig {
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

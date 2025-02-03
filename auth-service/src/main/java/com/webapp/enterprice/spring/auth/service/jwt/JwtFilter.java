@@ -1,11 +1,15 @@
 package com.webapp.enterprice.spring.auth.service.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webapp.enterprice.spring.auth.service.config.CustomUserDetailsService;
+import com.webapp.enterprice.spring.auth.service.exception.ErrorDetail;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,53 +23,68 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
-    private  JwtService jwtService;
+    private JwtService jwtService;
 
     @Autowired
     private CustomUserDetailsService service;
 
     /**
-     * Filters incoming requests to validate JWT tokens.
+     * Filters incoming requests and processes the JWT authentication.
      *
-     * @param request  The HttpServletRequest object that contains the request the client made to the servlet.
-     * @param response The HttpServletResponse object that contains the response the servlet returns to the client.
-     * @param filterChain The FilterChain for invoking the next filter or the resource.
-     * @throws ServletException If an exception occurs that interferes with the servlet's normal operation.
-     * @throws IOException If an input or output exception occurs.
-     *
-     * This method retrieves the Authorization header from the request, extracts the JWT token, and validates it.
-     * If the token is valid, it sets the authentication in the security context.
+     * @param request     the HTTP request
+     * @param response    the HTTP response
+     * @param filterChain the filter chain
+     * @throws ServletException if an error occurs during filtering
+     * @throws IOException      if an I/O error occurs during filtering
+     *                          <p>
+     *                          This method retrieves the Authorization header from the request, extracts the JWT token,
+     *                          and validates it. If the token is valid and the authentication context is empty, it sets
+     *                          the authentication in the SecurityContext. If the token is expired, it returns an error
+     *                          response with a 401 Unauthorized status and a JSON error message.
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // Retrieve the Authorization header
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
 
-        // Check if the header starts with "Bearer "
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7); // Extract token
-            username = jwtService.extractEmail(token); // Extract username from token
-        }
+        try {
 
-        // If the token is valid and no authentication is set in the context
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = service.loadUserByUsername(username);
-
-            // Validate token and set authentication
-            if (jwtService.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+                username = jwtService.extractEmail(token);
             }
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = service.loadUserByUsername(username);
+
+                if (jwtService.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            ErrorDetail error = new ErrorDetail();
+            error.setErrorCode(String.valueOf(HttpStatus.UNAUTHORIZED));
+            error.setErrorType(e.getMessage());
+            error.setMessage("Expired JWT token");
+            try {
+                response.getWriter().write(new ObjectMapper().writeValueAsString(error));
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+            return;
         }
 
         // Continue the filter chain
         filterChain.doFilter(request, response);
     }
 }
+
