@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(path = "api/v1/users")
@@ -97,7 +98,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> test() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        authorities.forEach(authority -> System.out.println("Role: " + authority.getAuthority()));
+        authorities.forEach(authority -> Logger.getLogger("Role: " + authority.getAuthority()));
         Map<String, String> response = new HashMap<>();
         response.put("code", String.valueOf(HttpStatus.OK));
         response.put("user", authentication.getPrincipal().toString());

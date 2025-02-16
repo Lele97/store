@@ -1,8 +1,6 @@
-package com.webapp.enterprice.spring.auth.service.exception;
-
+package com.webapp.enterprice.spring.api_gateway_service.exception;
 
 public class ErrorDetail {
-
     private String message;
     private String errorType;
     private String errorCode;

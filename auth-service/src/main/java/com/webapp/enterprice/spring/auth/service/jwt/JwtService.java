@@ -34,7 +34,7 @@ public class JwtService {
         claims.put("sub", userDetails.getUsername()); // Subject (email)
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority) // Extract role names
-                .collect(Collectors.toList())); // Add roles to claims
+                .toList()); // Add roles to claims
 
         return createToken(claims, userDetails.getUsername());
     }

@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-@Log4j
 public class AuthControllerTest {
 
     @Mock
@@ -46,63 +45,6 @@ public class AuthControllerTest {
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
     }
-
-//    @Test
-//    void shouldRegisterUserSuccessfully() throws Exception {
-//        UserRequest userRequest = new UserRequest();
-//        userRequest.setUsername("testuser");
-//        userRequest.setPassword("password");
-//        userRequest.setEmail("testuser@example.com");
-//        userRequest.setRoles(Collections.singleton("ROLE_USER"));
-//
-//        mockMvc.perform(post("/api/v1/users/register")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"username\":\"testuser\",\"password\":\"password\",\"email\":\"testuser@example.com\",\"roles\":\"ROLE_USER\"}"))
-//                .andExpect(status().isCreated())
-//                .andExpect(content().string("Registration successful"));
-//
-//        verify(userService, times(1)).registration(any(UserRequest.class));
-//    }
-//
-//    @Test
-//    void shouldReturnInternalServerErrorOnRegistrationFailure() throws Exception {
-//        UserRequest userRequest = new UserRequest();
-//        userRequest.setUsername("testuser");
-//        userRequest.setPassword("password");
-//        userRequest.setEmail("testuser@example.com");
-//        userRequest.setRoles("ROLE_USER");
-//
-//        doThrow(new Exception("Registration failed")).when(userService).registration(any(UserRequest.class));
-//
-//        mockMvc.perform(post("/api/v1/users/register")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"username\":\"testuser\",\"password\":\"password\",\"email\":\"testuser@example.com\",\"roles\":\"ROLE_USER\"}"))
-//                .andExpect(status().isInternalServerError())
-//                .andExpect(content().string("Registration failed"));
-//
-//        verify(userService, times(1)).registration(any(UserRequest.class));
-//    }
-
-//    @Test
-//    void shouldAuthenticateAndGenerateTokenSuccessfully() throws Exception {
-//        AuthRequest authRequest = new AuthRequest();
-//        authRequest.setEmail("testuser@example.com");
-//        authRequest.setPassword("password");
-//
-//        Authentication authentication = mock(Authentication.class);
-//        when(authentication.isAuthenticated()).thenReturn(true);
-//        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-//        when(jwtService.generateToken(authRequest.getEmail())).thenReturn("jwt-token");
-//
-//        mockMvc.perform(post("/api/v1/users/login")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"email\":\"testuser@example.com\",\"password\":\"password\"}"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().string("jwt-token"));
-//
-//        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-//        verify(jwtService, times(1)).generateToken(authRequest.getEmail());
-//    }
 
     @Test
     void shouldReturnUnauthorizedOnAuthenticationFailure() throws Exception {

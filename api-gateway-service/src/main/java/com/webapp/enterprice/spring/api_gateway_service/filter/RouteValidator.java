@@ -23,7 +23,9 @@ public class RouteValidator {
     );
 
     /**
-     *  TODO aggiornare javadoc
+     * A list of admin endpoints.
+     * <p>
+     * This list defines the endpoints that require admin access.
      */
     public static final List<String> adminEndpoints = List.of(
             "api/v1/products",
@@ -44,7 +46,9 @@ public class RouteValidator {
                     .stream()
                     .noneMatch(uri -> request.getURI().getPath().contains(uri));
     /**
-     * TODO aggiornare javadoc
+     * Predicate to check if a request is for an admin endpoint.
+     * <p>
+     * This predicate checks if the incoming request's URI matches any of the admin endpoints.
      */
     public Predicate<ServerHttpRequest> isAdminEndpoint = request -> adminEndpoints.stream().anyMatch(uri -> request.getURI().getPath().contains(uri));
 }

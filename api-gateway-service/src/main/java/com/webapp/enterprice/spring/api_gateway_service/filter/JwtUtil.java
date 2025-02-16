@@ -30,9 +30,13 @@ public class JwtUtil {
     }
 
     /**
-     * TODO aggiornare javadoc
-     * @param token
-     * @return
+     * Extracts all claims from the given JWT token.
+     *
+     * @param token The JWT token from which to extract claims.
+     * @return Claims The claims extracted from the token.
+     * <p>
+     * This method parses the given JWT token and returns all the claims contained in it.
+     * It uses the signing key to validate the token and extract the claims.
      */
     public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
@@ -43,18 +47,28 @@ public class JwtUtil {
     }
 
     /**
-     * TODO aggiornare javadoc
-     * @param token
-     * @return
+     * Extracts the email (subject) from the given JWT token.
+     *
+     * @param token The JWT token from which to extract the email.
+     * @return String The email extracted from the token.
+     * <p>
+     * This method extracts the email (subject) from the claims contained in the given JWT token.
+     * It calls the extractAllClaims method to get the claims and then retrieves the subject.
      */
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
     }
 
     /**
-     * TODO aggiornare javadoc
-     * @param token
-     * @return
+     * Extracts the roles from the given JWT token.
+     *
+     * @param token The JWT token from which to extract roles.
+     * @return Set<String> A set of roles extracted from the token.
+     * <p>
+     * This method extracts the roles from the claims contained in the given JWT token.
+     * It calls the extractAllClaims method to get the claims and then retrieves the "roles" claim.
+     * If the roles claim is null or missing, it returns an empty set. If roles are present, it converts them to a set of strings.
+     * If an exception occurs while extracting roles, it logs the error and returns an empty set.
      */
     public Set<String> extractRole(String token) {
         try {
@@ -72,7 +86,6 @@ public class JwtUtil {
             return roles.stream().map(Object::toString).collect(Collectors.toSet());
 
         } catch (Exception e) {
-            System.out.println("Failed to extract roles from token: " + e.getMessage());
             return Collections.emptySet();
         }
     }
