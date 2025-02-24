@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtService {
@@ -24,11 +23,18 @@ public class JwtService {
     public String SECRET;
 
     /**
-     * Generate token with given email
-     *  TODO aggiornare javadoc
-     * @param email
-     * @return
+     * Generates a JWT token with the given user details.
+     *
+     * @param userDetails The user details containing the email and roles.
+     * @return The generated JWT token.
+     * <p>
+     * This method creates a JWT token with the following claims:
+     * - `sub`: The subject, which is the email of the user.
+     * - `roles`: The roles assigned to the user.
+     *
+     * The token is created by calling the `createToken` method with the claims and the user's email.
      */
+
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", userDetails.getUsername()); // Subject (email)
