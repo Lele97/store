@@ -1,33 +1,19 @@
 package com.webapp.enterprice.spring.auth.service.exception;
 
 
-public class ErrorDetail {
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+@Setter
+@Getter
+public class ErrorDetail implements Serializable {
+    @java.io.Serial
+    private static final long serialVersionUID = -7034897190745766939L;
 
     private String message;
     private String errorType;
     private String errorCode;
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getErrorType() {
-        return errorType;
-    }
-
-    public void setErrorType(String errorType) {
-        this.errorType = errorType;
-    }
-
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(String errorCode) {
-        this.errorCode = errorCode;
-    }
 }

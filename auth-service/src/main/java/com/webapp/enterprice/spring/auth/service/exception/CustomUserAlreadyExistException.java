@@ -2,7 +2,7 @@ package com.webapp.enterprice.spring.auth.service.exception;
 
 public class CustomUserAlreadyExistException extends RuntimeException {
 
-    private ErrorDetail errorDetail;
+    private final transient ErrorDetail errorDetail;
 
     public CustomUserAlreadyExistException(ErrorDetail errorDetail) {
         super(errorDetail.getMessage());
@@ -11,9 +11,5 @@ public class CustomUserAlreadyExistException extends RuntimeException {
 
     public ErrorDetail getErrorDetail() {
         return errorDetail;
-    }
-
-    public void setErrorDetail(ErrorDetail errorDetail) {
-        this.errorDetail = errorDetail;
     }
 }
