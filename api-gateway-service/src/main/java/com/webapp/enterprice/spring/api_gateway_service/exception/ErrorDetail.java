@@ -1,9 +1,17 @@
 package com.webapp.enterprice.spring.api_gateway_service.exception;
 
+
 public class ErrorDetail {
+
     private String message;
     private String errorType;
-    private String errorCode;
+    private int errorCode;
+
+    public ErrorDetail(String message, String errorType, int errorCode) {
+        this.message = message;
+        this.errorType = errorType;
+        this.errorCode = errorCode;
+    }
 
     public String getMessage() {
         return message;
@@ -21,11 +29,11 @@ public class ErrorDetail {
         this.errorType = errorType;
     }
 
-    public String getErrorCode() {
+    public int getErrorCode() {
         return errorCode;
     }
 
-    public void setErrorCode(String errorCode) {
+    public void setErrorCode(int errorCode) {
         this.errorCode = errorCode;
     }
 }

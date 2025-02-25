@@ -24,9 +24,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtFilter jwtFilter;
-
     /**
      * List of endpoints that do not require authentication.
      * These endpoints are publicly accessible without any authorization.
@@ -69,7 +66,7 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
+                .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class).build();
     }
 
     @Bean

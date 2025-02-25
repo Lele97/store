@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class JwtUtil {
 
     @Value("${jwt.secret}")
-    private String SECRET;
+    private String secret;
 
     /**
      * Validates the provided JWT token.
@@ -99,7 +99,7 @@ public class JwtUtil {
      * HMAC-SHA encryption. The secret key is sourced from the application properties.
      */
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
