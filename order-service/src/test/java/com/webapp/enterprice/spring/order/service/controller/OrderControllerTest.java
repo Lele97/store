@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-public class OrderControllerTest {
+class OrderControllerTest {
 
     @Mock
     private OrderService orderService;

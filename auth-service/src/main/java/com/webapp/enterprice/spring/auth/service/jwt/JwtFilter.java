@@ -22,11 +22,13 @@ import java.io.IOException;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final CustomUserDetailsService service;
 
-    @Autowired
-    private CustomUserDetailsService service;
+    public JwtFilter(JwtService jwtService, CustomUserDetailsService service) {
+        this.jwtService = jwtService;
+        this.service = service;
+    }
 
     /**
      * Filters incoming requests and processes the JWT authentication.

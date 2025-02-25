@@ -1,7 +1,7 @@
 package com.webapp.enterprice.spring.auth.service.config;
 
 import com.webapp.enterprice.spring.auth.service.jwt.JwtFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.webapp.enterprice.spring.auth.service.jwt.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +23,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Bean
+    public JwtFilter jwtFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
+        return new JwtFilter(jwtService, userDetailsService);
+    }
 
     /**
      * List of endpoints that do not require authentication.
@@ -58,7 +63,7 @@ public class SecurityConfig {
      *                   UsernamePasswordAuthenticationFilter in the filter chain.
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(AUTH_WHITELIST).permitAll()
@@ -66,7 +71,7 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class).build();
+                .addFilterBefore(jwtFilter , UsernamePasswordAuthenticationFilter.class).build();
     }
 
     @Bean

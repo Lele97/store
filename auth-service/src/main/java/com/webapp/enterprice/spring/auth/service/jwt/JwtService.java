@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    public String SECRET;
+    public String secret;
 
     /**
      * Generates a JWT token with the given user details.
@@ -68,7 +68,7 @@ public class JwtService {
      * @return
      */
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

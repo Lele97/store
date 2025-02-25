@@ -56,14 +56,14 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             ServerHttpRequest modifiedRequest = exchange.getRequest();
 
             if (validator.isSecured.test(exchange.getRequest())) {
-                if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+                if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION))
                     throw new MissingAuthorizationRequestException("Missing authorization header");
-                }
+
 
                 String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-                if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                if (authHeader == null || !authHeader.startsWith("Bearer "))
                     throw new InvalidAuthorizationHeaderException("Invalid authorization header");
-                }
+
 
                 String token = authHeader.substring(7);
 
@@ -73,14 +73,14 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 String email = jwtUtil.extractEmail(token);
                 Set<String> roles = jwtUtil.extractRole(token);
 
-                if (roles.isEmpty()) {
+                if (roles.isEmpty())
                     throw new RoleNotFoundCustomException("No role found");
-                }
+
 
                 if (validator.isAdminEndpoint.test(exchange.getRequest())) {
-                    if (!roles.contains("ADMIN")) {
+                    if (!roles.contains("ADMIN"))
                         throw new AdminRoleNotAllowedException("Admin role not allowed");
-                    }
+
                 }
 
                 // Pass user details to downstream microservices

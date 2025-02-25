@@ -3,7 +3,6 @@ package com.webapp.enterprice.spring.auth.service.controller;
 import com.webapp.enterprice.spring.auth.service.entity.AuthRequest;
 import com.webapp.enterprice.spring.auth.service.jwt.JwtService;
 import com.webapp.enterprice.spring.auth.service.service.UserService;
-import lombok.extern.log4j.Log4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-public class AuthControllerTest {
+ class AuthControllerTest {
 
     @Mock
     private UserService userService;
