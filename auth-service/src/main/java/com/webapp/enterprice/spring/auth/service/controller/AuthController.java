@@ -1,7 +1,10 @@
 package com.webapp.enterprice.spring.auth.service.controller;
 
+import com.webapp.enterprice.spring.auth.service.config.CustomUserDetails;
 import com.webapp.enterprice.spring.auth.service.entity.AuthRequest;
 import com.webapp.enterprice.spring.auth.service.entity.UserRequest;
+import com.webapp.enterprice.spring.auth.service.exception.CustomUserAlreadyExistException;
+import com.webapp.enterprice.spring.auth.service.exception.ErrorDetail;
 import com.webapp.enterprice.spring.auth.service.jwt.JwtService;
 import com.webapp.enterprice.spring.auth.service.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -11,16 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(path = "api/v1/users")
@@ -47,12 +49,19 @@ public class AuthController {
      * If registration fails, it returns a HTTP 500 Internal Server Error status with the error message.
      */
     @PostMapping(path = "/register")
-    public ResponseEntity<String> register(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody UserRequest userRequest) {
         try {
             service.registration(userRequest);
-            return new ResponseEntity<>("Registration successful", HttpStatus.CREATED);
+            Map<String, String> response = new HashMap<>();
+            response.put("code", String.valueOf(HttpStatus.CREATED));
+            response.put("message", "User registered successfully");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            ErrorDetail error = new ErrorDetail();
+            error.setMessage("User registration failed");
+            error.setErrorCode(String.valueOf(HttpStatus.CONFLICT));
+            error.setErrorType(e.getMessage());
+            throw new CustomUserAlreadyExistException(error);
         }
     }
 
@@ -67,38 +76,34 @@ public class AuthController {
      * If authentication fails, it returns a HTTP 401 Unauthorized status with an error message.
      */
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
-
-            if (authentication.isAuthenticated()) {
-
-                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                String token = jwtService.generateToken(userDetails);
-                Map<String, String> response = new HashMap<>();
-                response.put("token", token);
-                response.put("expiresIn", "1800"); // 30 minutes in seconds
-
-                return new ResponseEntity<>(response.get("token"), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Invalid user request!", HttpStatus.UNAUTHORIZED);
-            }
-        } catch (UsernameNotFoundException e) {
-            return new ResponseEntity<>("User not found: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>("Authentication failed: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<Map<String, String>> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String token = jwtService.generateToken(userDetails);
+        Map<String, String> response = new HashMap<>();
+        response.put("code", String.valueOf(HttpStatus.OK));
+        response.put("token", token);
+        response.put("expiresIn", "1800");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
-     * TODO aggiornare javadoc
-     * @return
+     * Tests the authentication and returns user and role information.
+     *
+     * @return A ResponseEntity containing user and role information and HTTP status.
+     * <p>
+     * This endpoint retrieves the authentication details from the security context,
+     * extracts the user and role information, and returns it with a HTTP 200 OK status.
      */
     @GetMapping("/test")
-    public String test() {
+    public ResponseEntity<Map<String, String>> test() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        authorities.forEach(authority -> System.out.println("Role: " + authority.getAuthority()));
-        return "Test endpoint";
+        authorities.forEach(authority -> Logger.getLogger("Role: " + authority.getAuthority()));
+        Map<String, String> response = new HashMap<>();
+        response.put("code", String.valueOf(HttpStatus.OK));
+        response.put("user", ((CustomUserDetails) authentication.getPrincipal()).getUsername());
+        response.put("role", authorities.toString());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
