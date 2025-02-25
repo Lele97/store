@@ -13,11 +13,13 @@ import java.util.Set;
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
-    private RouteValidator validator;
-    private JwtUtil jwtUtil;
+    private final RouteValidator validator;
+    private final JwtUtil jwtUtil;
 
-    public AuthenticationFilter() {
+    public AuthenticationFilter(RouteValidator validator, JwtUtil jwtUtil) {
         super(Config.class);
+        this.validator = validator;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
@@ -53,27 +55,39 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         return (exchange, chain) -> {
             ServerHttpRequest modifiedRequest = exchange.getRequest();
 
-            if (validator.isSecured.test(exchange.getRequest()) && !exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION))
-                throw new MissingAuthorizationRequestException("Missing Authorization Request");
+            if (validator.isSecured.test(exchange.getRequest())) {
+                if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+                    throw new MissingAuthorizationRequestException("Missing authorization header");
+                }
 
-            String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+                String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+                if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                    throw new InvalidAuthorizationHeaderException("Invalid authorization header");
+                }
 
-            if (authHeader == null || !authHeader.startsWith("Bearer "))
-                throw new InvalidAuthorizationHeaderException("Invalid Authorization Header");
+                String token = authHeader.substring(7);
 
-            String token = authHeader.substring(7);
-            jwtUtil.validateToken(token);
-            String email = jwtUtil.extractEmail(token);
-            Set<String> roles = jwtUtil.extractRole(token);
 
-            if (roles.isEmpty())
-                throw new RoleNotFoundCustomException("Role Not Found");
+                jwtUtil.validateToken(token);
 
-            if (validator.isAdminEndpoint.test(exchange.getRequest()) && !roles.contains(email))
-                throw new AdminRoleNotAllowedException("Admin Role Not Allowed");
+                String email = jwtUtil.extractEmail(token);
+                Set<String> roles = jwtUtil.extractRole(token);
 
-            // Pass user details to downstream microservices
-            modifiedRequest = exchange.getRequest().mutate().header("loggedInUser", email).header("roles", String.join(",", roles)).build();
+                if (roles.isEmpty()) {
+                    throw new RoleNotFoundCustomException("No role found");
+                }
+
+                if (validator.isAdminEndpoint.test(exchange.getRequest())) {
+                    if (!roles.contains("ADMIN")) {
+                        throw new AdminRoleNotAllowedException("Admin role not allowed");
+                    }
+                }
+
+                // Pass user details to downstream microservices
+                modifiedRequest = exchange.getRequest().mutate().header("loggedInUser", email).header("roles", String.join(",", roles)).build();
+
+
+            }
 
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
         };

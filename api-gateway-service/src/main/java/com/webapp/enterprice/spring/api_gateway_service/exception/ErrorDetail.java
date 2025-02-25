@@ -1,7 +1,12 @@
 package com.webapp.enterprice.spring.api_gateway_service.exception;
 
+import java.io.Serial;
+import java.io.Serializable;
 
-public class ErrorDetail {
+public class ErrorDetail implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String message;
     private String errorType;

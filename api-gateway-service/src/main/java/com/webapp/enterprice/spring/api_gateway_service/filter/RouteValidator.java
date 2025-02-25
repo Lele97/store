@@ -2,12 +2,15 @@ package com.webapp.enterprice.spring.api_gateway_service.filter;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 
 import java.util.List;
 import java.util.function.Predicate;
 
 @Component
 public class RouteValidator {
+
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     /**
      * A list of open API endpoints that do not require security validation.
@@ -31,7 +34,7 @@ public class RouteValidator {
      * - /api/v1/products/**
      */
     public static final List<String> adminEndpoints = List.of(
-            "api/v1/products",
+            "/api/v1/products",
             "/api/v1/products/**");
 
     /**
@@ -53,6 +56,6 @@ public class RouteValidator {
      * <p>
      * This predicate checks if the incoming request's URI matches any of the admin endpoints.
      */
-    Predicate<ServerHttpRequest> isAdminEndpoint = request -> adminEndpoints.stream().anyMatch(uri -> request.getURI().getPath().contains(uri));
+    Predicate<ServerHttpRequest> isAdminEndpoint = request -> adminEndpoints.stream().anyMatch(uri -> pathMatcher.match(uri, request.getURI().getPath()));
 }
 
