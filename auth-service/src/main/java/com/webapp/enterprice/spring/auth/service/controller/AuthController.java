@@ -1,5 +1,6 @@
 package com.webapp.enterprice.spring.auth.service.controller;
 
+import com.webapp.enterprice.spring.auth.service.config.CustomUserDetails;
 import com.webapp.enterprice.spring.auth.service.entity.AuthRequest;
 import com.webapp.enterprice.spring.auth.service.entity.UserRequest;
 import com.webapp.enterprice.spring.auth.service.exception.CustomUserAlreadyExistException;
@@ -101,7 +102,7 @@ public class AuthController {
         authorities.forEach(authority -> Logger.getLogger("Role: " + authority.getAuthority()));
         Map<String, String> response = new HashMap<>();
         response.put("code", String.valueOf(HttpStatus.OK));
-        response.put("user", authentication.getPrincipal().toString());
+        response.put("user", ((CustomUserDetails) authentication.getPrincipal()).getUsername());
         response.put("role", authorities.toString());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
