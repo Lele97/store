@@ -6,7 +6,6 @@ import com.webapp.enterprice.spring.auth.service.entity.UserRequest;
 import com.webapp.enterprice.spring.auth.service.repository.RoleRepository;
 import com.webapp.enterprice.spring.auth.service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +18,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository repository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    private PasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository repository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder bCryptPasswordEncoder;
 
     /**
      * Service for registration new User
