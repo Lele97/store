@@ -1,6 +1,7 @@
 package com.webapp.enterprice.spring.auth.service.controller;
 
 import com.webapp.enterprice.spring.auth.service.config.CustomUserDetails;
+import com.webapp.enterprice.spring.auth.service.config.HasiCorpVaultSecretData;
 import com.webapp.enterprice.spring.auth.service.entity.AuthRequest;
 import com.webapp.enterprice.spring.auth.service.entity.UserRequest;
 import com.webapp.enterprice.spring.auth.service.exception.CustomUserAlreadyExistException;
@@ -37,6 +38,9 @@ public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    private final HasiCorpVaultSecretData hasiCorpVaultSecretData;
+
 
     /**
      * Handles user registration.
@@ -105,5 +109,10 @@ public class AuthController {
         response.put("user", ((CustomUserDetails) authentication.getPrincipal()).getUsername());
         response.put("role", authorities.toString());
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/secrets")
+    public String getSecrets() {
+        return "Username: " + hasiCorpVaultSecretData.getUsername() + ", Password: " + hasiCorpVaultSecretData.getPassword();
     }
 }
