@@ -29,6 +29,11 @@ public class SecurityConfig {
         return new JwtFilter(jwtService, userDetailsService);
     }
 
+    @Bean
+    public HasiCorpVaultSecretData hasiCorpVaultSecretData() {
+        return new HasiCorpVaultSecretData();
+    }
+
     /**
      * List of endpoints that do not require authentication.
      * These endpoints are publicly accessible without any authorization.
@@ -36,7 +41,8 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             "/api/v1/users/login",
             "/api/v1/users/register",
-            "/api/v1/users/test"
+            "/api/v1/users/test",
+            "/api/v1/users/secrets",
     };
 
     /**
